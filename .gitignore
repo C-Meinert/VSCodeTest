@@ -1,1 +1,2 @@
-testNetCoreApp/obj/Debug/**/*
+testNetCoreApp/obj/
+testNetCoreApp/bin/

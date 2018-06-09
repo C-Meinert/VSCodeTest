@@ -1,12 +1,25 @@
 ﻿using System;
+using System.IO;
+using System.Threading;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace testNetCoreApp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Starting Kestrel");
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
         }
     }
 }
