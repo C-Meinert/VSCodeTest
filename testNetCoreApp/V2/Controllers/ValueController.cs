@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace testNetCoreApp.Controllers.V1
+namespace testNetCoreApp.V2.Controllers
 {
     [ApiVersion("2.0")]
     [Produces("application/json")]
