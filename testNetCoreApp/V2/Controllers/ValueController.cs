@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace testNetCoreApp.Controllers.V1
 {
+    [ApiVersion("2.0")]
     [Produces("application/json")]
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class ValueController : Controller 
     {
 
