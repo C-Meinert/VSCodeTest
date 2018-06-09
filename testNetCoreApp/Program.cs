@@ -16,6 +16,7 @@ namespace testNetCoreApp
             Console.WriteLine("Starting Kestrel");
             var host = new WebHostBuilder()
                 .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .Build();
 

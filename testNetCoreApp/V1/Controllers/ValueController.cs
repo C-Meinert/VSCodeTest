@@ -6,24 +6,39 @@ using System.Threading.Tasks;
 
 namespace testNetCoreApp.V1.Controllers
 {
+    /// <summary>
+    ///  
+    /// </summary>
     [ApiVersion("1.0")]
     [Produces("application/json")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class ValueController : Controller 
+    public class ValueController : Controller
     {
 
-        public ValueController() {
+        /// <summary>
+        ///  Constructor
+        /// </summary>
+        public ValueController()
+        {
 
         }
 
+        /// <summary>
+        ///  Get All the Values
+        /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Get() {
-            return Ok(new List<string>(){"value1", "value2"});
+        public async Task<IActionResult> Get()
+        {
+            return Ok(new List<string>() { "value1", "value2" });
         }
 
-        [HttpGet("{id}", Name="GetById")]
-        public async Task<IActionResult> Get(int id) {
+        /// <summary>
+        ///  Get Values by ID
+        /// </summary>
+        [HttpGet("{id}", Name = "GetById")]
+        public async Task<IActionResult> Get(int id)
+        {
             return Ok(id);
         }
-    }    
+    }
 }
