@@ -15,6 +15,9 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace testNetCoreApp
 {
+    /// <summary>
+    ///  This class is used to configure all the runtime hosting settings
+    /// </summary>
     public class Startup
     {
         /// <summary>

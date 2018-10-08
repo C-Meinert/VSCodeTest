@@ -9,10 +9,17 @@ using Serilog;
 
 namespace testNetCoreApp
 {
+    /// <summary>
+    ///  The hosting class
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        ///  Program Entry Point
+        /// </summary>
         public static void Main(string[] args)
         {
+            // Setup self host
             Console.WriteLine("Starting Kestrel");
             var host = new WebHostBuilder()
                 .UseKestrel()

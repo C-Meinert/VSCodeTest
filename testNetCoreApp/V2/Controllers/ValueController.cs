@@ -35,7 +35,7 @@ namespace testNetCoreApp.V2.Controllers
         /// <summary>
         ///  Get Values by ID
         /// </summary>
-        [HttpGet("{id}", Name = "GetById")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             return Ok(id);
