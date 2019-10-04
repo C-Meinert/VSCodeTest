@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using testNetCoreApp.Utilities.Controllers;
-using testNetCoreApp.Utilities.Logging;
 using testNetCoreApp.V2.Dtos;
 
 namespace testNetCoreApp.V2.Controllers
@@ -21,7 +21,7 @@ namespace testNetCoreApp.V2.Controllers
         /// <summary>
         ///  Constructor
         /// </summary>
-        public DtoController(ILoggingService log)
+        public DtoController(ILogger log)
             : base(log)
         {
 

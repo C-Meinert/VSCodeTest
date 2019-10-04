@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
@@ -15,12 +16,34 @@ namespace testNetCoreApp
     public class Startup
     {
         /// <summary>
+        /// Application Settings
+        /// </summary>
+        /// <value></value>
+        public IConfiguration Configuration {get;}
+        
+        private readonly bool _isDevelopment;
+    
+        /// <summary>
+        /// Constructor mostly used to perform some "pre-startup" tasks
+        /// </summary>
+        /// <param name="env"></param>
+        public Startup(IHostEnvironment env) {
+            _isDevelopment = env.IsDevelopment();
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appSettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appSettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+            
+            Configuration = builder.Build();
+        }
+
+        /// <summary>
         /// Set up services
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ILoggingService, LoggingService>();
             services.AddControllers();
             // services.AddApiVersioning(o =>
             // {
@@ -28,6 +51,7 @@ namespace testNetCoreApp
             //     o.AssumeDefaultVersionWhenUnspecified = true;
             // });
 
+            SeriLogConfig.AddSerilogServices(services, Configuration);
             ConfigureSwagger(services);
         }
 
@@ -35,9 +59,11 @@ namespace testNetCoreApp
         /// Configure App
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
+            if(_isDevelopment)
+                app.UseDeveloperExceptionPage();
+
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -70,6 +96,6 @@ namespace testNetCoreApp
         /// </summary>
         /// <returns></returns>
         private static string xmlDoc =>
-            Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+            Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");            
     }
 }

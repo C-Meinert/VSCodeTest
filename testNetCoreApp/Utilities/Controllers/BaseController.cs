@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using testNetCoreApp.Utilities.Logging;
+using Serilog;
 
 namespace testNetCoreApp.Utilities.Controllers
 {
@@ -9,15 +9,15 @@ namespace testNetCoreApp.Utilities.Controllers
     public class BaseController : ControllerBase
     { 
         /// <summary>
-        /// 
+        /// Logger
         /// </summary>
-        protected ILoggingService _log;
+        protected ILogger _log;
 
         /// <summary>
-        /// 
+        /// Base Constructor
         /// </summary>
         /// <param name="log"></param>
-        protected BaseController(ILoggingService log) {
+        protected BaseController(ILogger log) {
             _log = log;
         }
     }

@@ -25,6 +25,7 @@ namespace testNetCoreApp
         /// <returns>Configured IHostBuilder</returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webHostBuilder =>
                 {
                     webHostBuilder.UseUrls("http://localhost:5000");

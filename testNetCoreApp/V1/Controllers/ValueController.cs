@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using testNetCoreApp.Utilities.Controllers;
-using testNetCoreApp.Utilities.Logging;
 
 namespace testNetCoreApp.V1.Controllers
 {
@@ -20,7 +19,7 @@ namespace testNetCoreApp.V1.Controllers
         /// <summary>
         ///  Constructor
         /// </summary>
-        public ValueController(ILoggingService log)
+        public ValueController(ILogger log)
             : base(log)
         {
         }
