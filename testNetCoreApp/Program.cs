@@ -1,10 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Server.HttpSys;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace testNetCoreApp
@@ -15,19 +10,25 @@ namespace testNetCoreApp
     public class Program
     {
         /// <summary>
-        ///  Program Entry Point
+        /// Program entry point
         /// </summary>
+        /// <param name="args">Command line arguments</param>
         public static void Main(string[] args)
         {
-            // Setup self host
-            Console.WriteLine("Starting Kestrel");
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseStartup<Startup>()
-                .Build();
-
-            host.Run();
+            CreateHostBuilder(args).Build().Run();
         }
+
+        /// <summary>
+        /// Configure host builder
+        /// </summary>
+        /// <param name="args">arguments passed to program</param>
+        /// <returns>Configured IHostBuilder</returns>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webHostBuilder =>
+                {
+                    webHostBuilder.UseUrls("http://localhost:5000");
+                    webHostBuilder.UseStartup<Startup>();
+                });
     }
 }

@@ -1,26 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using testNetCoreApp.Utilities.Controllers;
+using testNetCoreApp.Utilities.Logging;
 
 namespace testNetCoreApp.V1.Controllers
 {
     /// <summary>
     ///  
     /// </summary>
-    [ApiVersion("1.0")]
+    // [ApiVersion("1.0")]
     [Produces("application/json")]
-    [Route("api/v{version:apiVersion}/[controller]")]
-    public class ValueController : Controller
+    // [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("api/v1/[controller]")]
+    public class ValueController : BaseController
     {
 
         /// <summary>
         ///  Constructor
         /// </summary>
-        public ValueController()
+        public ValueController(ILoggingService log)
+            : base(log)
         {
-
         }
 
         /// <summary>
@@ -29,6 +31,7 @@ namespace testNetCoreApp.V1.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            _log.Debug("Test");
             return Ok(new List<string>() { "value1", "value2" });
         }
 
