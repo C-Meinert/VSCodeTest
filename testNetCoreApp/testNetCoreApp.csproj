@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DocumentationFile>bin\$(Configuration)\netcoreapp1.0\testNetCoreApp.xml</DocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\netcoreapp3.0\testNetCoreApp.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
