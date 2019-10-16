@@ -9,10 +9,11 @@ namespace testNetCoreApp.V1.Controllers
     /// <summary>
     ///  
     /// </summary>
-    // [ApiVersion("1.0")]
+    [ApiController]
+    [ApiVersion("1.0")]    
+    [Route("api/v{version:apiVersion}/[controller]")]
+    // [Route("api/v1/[controller]")]
     [Produces("application/json")]
-    // [Route("api/v{version:apiVersion}/[controller]")]
-    [Route("api/v1/[controller]")]
     public class ValueController : BaseController
     {
 
