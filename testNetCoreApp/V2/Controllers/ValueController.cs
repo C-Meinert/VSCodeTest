@@ -1,24 +1,28 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using testNetCoreApp.Utilities.Controllers;
 
 namespace testNetCoreApp.V2.Controllers
 {
     /// <summary>
     ///  
     /// </summary>
-    [ApiVersion("2.0")]
-    [Produces("application/json")]
+    [ApiController]
+    [ApiVersion("2.0")]    
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class ValueController : Controller
+    //[Route("api/v2/[controller]")]
+    [Produces("application/json")]
+    public class ValueController : BaseController
     {
 
         /// <summary>
         ///  Constructor
         /// </summary>
-        public ValueController()
+        public ValueController(ILogger log)
+            : base(log)
         {
 
         }

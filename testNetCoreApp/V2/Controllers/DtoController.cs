@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using testNetCoreApp.Utilities.Controllers;
 using testNetCoreApp.V2.Dtos;
 
 namespace testNetCoreApp.V2.Controllers
@@ -11,15 +12,18 @@ namespace testNetCoreApp.V2.Controllers
     /// <summary>
     ///  
     /// </summary>
-    [ApiVersion("2.0")]
-    [Produces("application/json")]
+    [ApiController]
+    [ApiVersion("2.0")]    
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class DtoController : Controller
+    // [Route("api/v2/[controller]")]
+    [Produces("application/json")]
+    public class DtoController : BaseController
     {
         /// <summary>
         ///  Constructor
         /// </summary>
-        public DtoController()
+        public DtoController(ILogger log)
+            : base(log)
         {
 
         }
@@ -30,7 +34,7 @@ namespace testNetCoreApp.V2.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-
+            _log.Debug("test2");
             return Ok(makeDtos());
         }
 

@@ -1,17 +1,16 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Server.HttpSys;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.PlatformAbstractions;
 using System;
 using System.IO;
 using System.Reflection;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using testNetCoreApp.Utilities.Logging;
+using testNetCoreApp.Utilities.Swagger;
 
 namespace testNetCoreApp
 {
@@ -21,112 +20,113 @@ namespace testNetCoreApp
     public class Startup
     {
         /// <summary>
-        ///  Application Configuration
+        /// Application Settings
         /// </summary>
-        /// <value>The currently loaded configuration</value>
+        /// <value></value>
         public IConfiguration Configuration { get; }
 
+        private readonly bool _isDevelopment;
+
         /// <summary>
-        ///  Initializes a new instance of the <see cref="Startup"/> class.
+        /// Constructor mostly used to perform some "pre-startup" tasks
         /// </summary>
-        /// <param name="env">The current hosting environment.</param>
-        public Startup(IHostingEnvironment env)
+        /// <param name="env"></param>
+        public Startup(IHostEnvironment env)
         {
-            // get settings from appsettings > appsettings.ENV > EnvironmentVars
-            // last value read, wins
-            var Builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
+            _isDevelopment = env.IsDevelopment();
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appSettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appSettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile($"appSettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            Configuration = Builder.Build();
+            Configuration = builder.Build();
         }
 
         /// <summary>
-        /// Configures services for the application.
+        /// Set up services
         /// </summary>
-        /// <param name="services">The collection of services to configure the application with.</param>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore()
-                .AddVersionedApiExplorer();
-            services.AddMvc()
-                .AddControllersAsServices();
+            // Add API controllers as services
+            services.AddControllers();
+            ConfigureApiVersioning(services);
+            // Add and configure Serilog
+            SeriLogConfig.AddSerilogServices(services, Configuration);
+            // Configure seagger settings
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();  
+            ConfigureSwagger(services);
+        }
 
-            // setup versioning
-            services.AddApiVersioning(options =>
+        /// <summary>
+        /// Configure App
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="provider"></param>
+        public void Configure(IApplicationBuilder app, IApiVersionDescriptionProvider provider)
+        {
+            if (_isDevelopment)
+                app.UseDeveloperExceptionPage();
+
+            app.UseRouting();
+            app.UseEndpoints(endpoint =>
             {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1, 0);
+                endpoint.MapControllers();
             });
 
-            // setup swagger
-            services.AddSwaggerGen(options =>
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                // resolve the IApiVersionDescriptionProvider service
-                // note: that we have to build a temporary service provider here because one has not been created yet
-                var provider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
-
-                // add a swagger document for each discovered API version
-                // note: you might choose to skip or document deprecated API versions differently
-                foreach (var description in provider.ApiVersionDescriptions)
-                {
-                    options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));
+                // build a swagger endpoint for each discovered API version
+                foreach(var description in provider.ApiVersionDescriptions) {
+                    c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                 }
-
-                // integrate xml comments
-                options.IncludeXmlComments(XmlCommentsFilePath);
             });
         }
 
         /// <summary>
-        /// Configures the application using the provided builder
+        /// Configure API versioning
         /// </summary>
-        public void Configure(IApplicationBuilder app)
+        /// <param name="services"></param>
+        private void ConfigureApiVersioning(IServiceCollection services)
         {
-            app.UseMvc();
-            app.UseSwagger();
-            app.UseSwaggerUI(
-                options =>
-                {
-                    // resolve the IApiVersionDescriptionProvider service
-                    var provider = app.ApplicationServices.GetRequiredService<IApiVersionDescriptionProvider>();
+            services.AddApiVersioning(o =>
+            {
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.AssumeDefaultVersionWhenUnspecified = true;
+            });
+            services.AddVersionedApiExplorer(o =>
+            {
+                // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                o.GroupNameFormat = "'v'VVV";
 
-                    // build a swagger endpoint for each discovered API version
-                    foreach (var description in provider.ApiVersionDescriptions)
-                    {
-                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                    }
-                });
+                // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                // can also be used to control the format of the API version in route templates
+                o.SubstituteApiVersionInUrl = true;
+                o.SubstitutionFormat = "VVV";
+            });
         }
 
-        private static string XmlCommentsFilePath
+        /// <summary>
+        /// configure swagger gen
+        /// </summary>
+        /// <param name="services"></param>
+        private void ConfigureSwagger(IServiceCollection services)
         {
-            get
+            services.AddSwaggerGen(c =>
             {
-                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-                var fileName = typeof(Startup).GetTypeInfo().Assembly.GetName().Name + ".xml";
-                return Path.Combine(basePath, fileName);
-            }
+                c.OperationFilter<SwaggerDefaultValues>();
+                c.IncludeXmlComments(xmlDoc);
+            });
         }
 
-        private static Info CreateInfoForApiVersion(ApiVersionDescription description)
-        {
-            var info = new Info()
-            {
-                Title = $"Sample API {description.ApiVersion}",
-                Version = description.ApiVersion.ToString(),
-                Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
-                License = new License() { Name = "MIT", Url = "https://opensource.org/licenses/MIT" }
-            };
-
-            if (description.IsDeprecated)
-            {
-                info.Description += " This API version has been deprecated.";
-            }
-
-            return info;
-        }
+        /// <summary>
+        /// Gets the full path to the generate XML doc
+        /// </summary>
+        /// <returns></returns>
+        private static string xmlDoc =>
+            Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
     }
 }
