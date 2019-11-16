@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using testNetCoreApp.Utilities.Configuration;
 using testNetCoreApp.Utilities.Controllers;
 using testNetCoreApp.V2.Dtos;
 
@@ -19,14 +20,13 @@ namespace testNetCoreApp.V2.Controllers
     [Produces("application/json")]
     public class DtoController : BaseController
     {
+
         /// <summary>
         ///  Constructor
         /// </summary>
-        public DtoController(ILogger log)
-            : base(log)
-        {
-
-        }
+        public DtoController(IAppConfiguration appConfig, ILogger log)
+            : base(appConfig, log)
+        {  }
 
         /// <summary>
         ///  Get All the Values
