@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using testNetCoreApp.Utilities.Configuration;
 using testNetCoreApp.Utilities.Logging;
 using testNetCoreApp.Utilities.Swagger;
 
@@ -57,6 +58,7 @@ namespace testNetCoreApp
             // Configure seagger settings
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();  
             ConfigureSwagger(services);
+            services.AddSingleton<IAppConfiguration, AppConfiguration>(); // Added as singleton for now
         }
 
         /// <summary>

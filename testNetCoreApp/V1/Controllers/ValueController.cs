@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using testNetCoreApp.Utilities.Configuration;
 using testNetCoreApp.Utilities.Controllers;
 
 namespace testNetCoreApp.V1.Controllers
@@ -20,10 +21,9 @@ namespace testNetCoreApp.V1.Controllers
         /// <summary>
         ///  Constructor
         /// </summary>
-        public ValueController(ILogger log)
-            : base(log)
-        {
-        }
+        public ValueController(IAppConfiguration appConfig, ILogger log)
+            : base(appConfig, log)
+        {  }
 
         /// <summary>
         ///  Get All the Values
