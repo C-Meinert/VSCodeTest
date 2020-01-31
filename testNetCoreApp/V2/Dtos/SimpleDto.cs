@@ -18,7 +18,7 @@ namespace testNetCoreApp.V2.Dtos
         public string prop1 { get; set; }
 
         /*
-         * Add addition properties here
+         * Add additional properties here
          */
     }
 }

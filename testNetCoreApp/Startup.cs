@@ -71,12 +71,6 @@ namespace testNetCoreApp
             if (_isDevelopment)
                 app.UseDeveloperExceptionPage();
 
-            app.UseRouting();
-            app.UseEndpoints(endpoint =>
-            {
-                endpoint.MapControllers();
-            });
-
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -84,6 +78,20 @@ namespace testNetCoreApp
                 foreach(var description in provider.ApiVersionDescriptions) {
                     c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                 }
+            });
+
+            app.UseRouting();
+
+            /*
+             * UseCors, UseAuthentication, and UseAuthorization must appear between UseRouting and UseEndpoints
+            */
+            // app.UseCors();
+            // app.UseAuthentication();
+            // app.UseAuthorization();
+
+            app.UseEndpoints(endpoint =>
+            {
+                endpoint.MapControllers();
             });
         }
 
